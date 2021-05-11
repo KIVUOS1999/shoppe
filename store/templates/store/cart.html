@@ -1,0 +1,71 @@
+{% load static %}
+
+<script type="text/javascript">
+	var user = '{{request.user}}'
+
+	function getCookie(name) {
+	    let cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        const cookies = document.cookie.split(';');
+	        for (let i = 0; i < cookies.length; i++) {
+	            const cookie = cookies[i].trim();
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+	const csrftoken = getCookie('csrftoken');
+</script>
+
+<a href="{% url 'login' %}">Login</a>
+<a href="{% url 'cart' %}">Cart</a>
+
+<hr>
+<hr>
+
+<!-- Total price header -->
+<div>
+	<a href="/">< Back to store</a>
+	<br>
+
+	Total added items: <b>{{order.total_items_in_cart}}</b><br>
+	Total price: <b>{{order.grand_total}}</b><br>
+	<a href="{% url 'checkout' %}"><input type="button" name="" value = "checkout"></a><br>
+</div>
+<!---->
+<br><br><hr>
+<!-- List of all brought items -->
+<div>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Price</th>
+			<th>Quantity</th>
+			<th>Total</th>
+		</tr>
+		{% for item in items %}
+		<tr>
+			<td>{{item.product.name}}</td>
+			<td>{{item.product.price}}</td>
+			<td>{{item.quantity}}</td>
+			<td>{{item.total}}</td>
+			<td><button class='add_cart' data-product = {{item.product.id}} data-action = 'add'>+</button></td>
+			<td><button class='add_cart' data-product = {{item.product.id}} data-action = 'remove'>-</button></td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+<!---->
+
+<br><br><br>
+<hr><hr>
+<h1>Footer</h1>
+
+<script type="text/javascript", src="{% static 'js/cart.js' %}"></script>
+
+
+
