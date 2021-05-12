@@ -1,1 +1,28 @@
-this is login page
+{% load static %}
+
+<script type="text/javascript">
+	function getCookie(name) {
+	    let cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        const cookies = document.cookie.split(';');
+	        for (let i = 0; i < cookies.length; i++) {
+	            const cookie = cookies[i].trim();
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+	const csrftoken = getCookie('csrftoken');
+</script>
+
+
+<h2>login</h2>
+<form id='form'>
+	<input type="text" name="email" placeholder="email" class="form_inp"><br>
+	<input type="password" name="password" placeholder="password" class="form_inp"><br>
+</form>
+<button id = "submit">Submit</button>

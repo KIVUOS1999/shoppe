@@ -52,7 +52,6 @@ def checkout(request):
 		items = []
 	return render(request, 'store/checkout.html', {'items':items, 'order':order})
 
-
 def proceedToPayment(request):
 	transaction_id = datetime.datetime.now().timestamp()
 	data = json.loads(request.body)
@@ -81,3 +80,21 @@ def proceedToPayment(request):
 
 
 	return JsonResponse({'message':"Proceed to payment"}, safe = False)
+
+def register_page(request):
+	return render(request, "store/register_page.html", {})
+
+def trans_register_page(request):
+	data = json.loads(request.body)
+	usr = User.objects.create_user(
+		data['registration_data']['username'],
+		'',
+		data['registration_data']['pass1'],
+	)
+	curr_user, created = Customer.objects.get_or_create(user = usr)
+	curr_user.name = data['registration_data']['name']
+	curr_user.email = data['registration_data']['email']
+
+	curr_user.save()
+
+	return JsonResponse('register_page', safe=False)
