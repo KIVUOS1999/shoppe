@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import *
 from django.http import JsonResponse
 import json
+import datetime
 
 def home(request):
 	return render(request, "store/store.html", {'products':Product.objects.all()})
@@ -50,3 +51,33 @@ def checkout(request):
 	else:
 		items = []
 	return render(request, 'store/checkout.html', {'items':items, 'order':order})
+
+
+def proceedToPayment(request):
+	transaction_id = datetime.datetime.now().timestamp()
+	data = json.loads(request.body)
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer = customer, completed = False)
+		total = float(data['form']['total'])
+		order.transaction_id = transaction_id
+
+		if(total == order.grand_total):
+			order.completed = True
+
+		order.save()
+
+		ShippingAddress.objects.create(
+			customer = customer,
+			order = order,
+			address = data['shipping']['address'],
+			city = data['shipping']['city'],
+			state = data['shipping']['state'],
+			zip_code = data['shipping']['zipcode'],
+		)
+
+	else:
+		print("User is not logged in")
+
+
+	return JsonResponse({'message':"Proceed to payment"}, safe = False)

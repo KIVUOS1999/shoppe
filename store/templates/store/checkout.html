@@ -1,5 +1,26 @@
 {% load static %}
 
+<script type="text/javascript">
+	var user = '{{request.user}}'
+
+	function getCookie(name) {
+	    let cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        const cookies = document.cookie.split(';');
+	        for (let i = 0; i < cookies.length; i++) {
+	            const cookie = cookies[i].trim();
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+	const csrftoken = getCookie('csrftoken');
+</script>
+
 <a href="{% url 'login' %}">Login</a>
 <a href="{% url 'cart' %}">Cart</a>
 
@@ -55,25 +76,48 @@
 
 
 <script type="text/javascript">
-	var total = '{{order.grand_total|floatformat:2}}';
+	var total = '{{order.grand_total}}';
 	var form = document.getElementById('form');
 	var butt = document.getElementById('make-payment').addEventListener('click', function(e){
 		submitformdata()
 	})
 	
 	function submitformdata(){
+
+		var userFormData = {
+			'total':total,
+		}
+
 		var shippinginfo = {
 			'address':null,
 			'city':null,
 			'state':null,
 			'zipcode':null,
-		};
+		}
+
 		shippinginfo.address = form.address.value
 		shippinginfo.city = form.city.value
 		shippinginfo.state = form.state.value
 		shippinginfo.zipcode = form.zipcode.value
-		console.log(shippinginfo);
-	}
 
+		var url = '/proceedToPayment/'
+		fetch (url, {
+			method : 'POST',
+			headers: {
+				'Content-Type':'application/json',
+				'X-CSRFToken': csrftoken,
+			},
+			body:JSON.stringify({
+				'form':userFormData,
+				'shipping':shippinginfo
+			})
+		})
+		.then((response) => response.json())
+		.then((data) => {
+			console.log(shippinginfo);
+			alert('transaction completed');
+			window.location.href = "{% url 'home' %}";
+		})
+	}
 
 </script>
